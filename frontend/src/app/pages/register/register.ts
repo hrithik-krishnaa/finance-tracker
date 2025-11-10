@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { ApiService } from '../../services/api';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { ApiService } from '../../services/api';
 
 @Component({
   selector: 'app-register',
@@ -12,18 +12,18 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./register.scss']
 })
 export class RegisterComponent {
-  fullName = '';
-  email = '';
-  password = '';
-  loading = false;
-  error = '';
-  success = '';
+  fullName: string = '';
+  email: string = '';
+  password: string = '';
+  loading: boolean = false;
+  error: string = '';
+  success: string = '';
 
   constructor(private api: ApiService, private router: Router) {}
 
-  register(): void {
+  register() {
     if (!this.fullName || !this.email || !this.password) {
-      this.error = 'Please fill in all fields.';
+      this.error = 'Please fill all fields.';
       return;
     }
 
@@ -31,28 +31,19 @@ export class RegisterComponent {
     this.error = '';
     this.success = '';
 
-    const userData = {
-      fullName: this.fullName,
-      email: this.email,
-      password: this.password
-    };
-
-    this.api.register(userData).subscribe({
-      next: (res: any) => {
-        this.loading = false;
-        this.success = 'Registration successful! You can now log in.';
-        console.log('✅ Registration response:', res);
-        setTimeout(() => this.router.navigate(['/login']), 1500);
+    this.api.register(this.email, this.password, this.fullName).subscribe({
+      next: (res) => {
+        console.log('Registration success:', res);
+        this.success = 'Account created successfully!';
+        alert('Registration successful! Please login.');
+        this.router.navigate(['/login']);
       },
       error: (err) => {
-        console.error('❌ Registration error:', err);
-        this.loading = false;
-        this.error = 'Failed to register. Please try again.';
+        console.error('Registration failed:', err);
+        this.error = 'Email already exists or invalid input.';
       }
+    }).add(() => {
+      this.loading = false;
     });
-  }
-
-  goToLogin(): void {
-    this.router.navigate(['/login']);
   }
 }

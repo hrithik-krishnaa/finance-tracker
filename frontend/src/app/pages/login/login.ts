@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { ApiService } from '../../services/api';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiService } from '../../services/api';
 
 @Component({
   selector: 'app-login',
@@ -14,44 +14,37 @@ import { FormsModule } from '@angular/forms';
 export class LoginComponent {
   email = '';
   password = '';
-  loading = false;
   errorMsg = '';
+  loading = false;
 
   constructor(private api: ApiService, private router: Router) {}
 
-  login(): void {
+  login() {
     if (!this.email || !this.password) {
-      this.errorMsg = 'Please fill in both email and password.';
+      this.errorMsg = 'Please enter both email and password.';
       return;
     }
 
     this.loading = true;
-    this.errorMsg = '';
-
-    const credentials = {
-      email: this.email,
-      password: this.password
-    };
-
-    this.api.login(credentials).subscribe({
+    this.api.login(this.email, this.password).subscribe({
       next: (res: any) => {
-        this.loading = false;
-        console.log('✅ Login response:', res);
-
-        if (res?.token) localStorage.setItem('token', res.token);
-        if (res?.user) localStorage.setItem('user', JSON.stringify(res.user));
-
+        console.log('Login success:', res);
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('user', JSON.stringify(res.user));
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
-        console.error('❌ Login error:', err);
+        console.error('Login failed:', err);
+        this.errorMsg = 'Invalid credentials. Please try again.';
         this.loading = false;
-        this.errorMsg = 'Invalid email or password.';
+      },
+      complete: () => {
+        this.loading = false;
       }
     });
   }
 
-  goToRegister(): void {
+  goToRegister() {
     this.router.navigate(['/register']);
   }
 }

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgChartsModule } from 'ng2-charts';
-import { ChartData } from 'chart.js';
+import { ChartConfiguration } from 'chart.js';
 import { ApiService } from '../../services/api';
 import { NavbarComponent } from '../../components/navbar/navbar';
 import { AiInsightsComponent } from '../../components/ai-insights/ai-insights';
@@ -10,81 +10,105 @@ import { AiInsightsComponent } from '../../components/ai-insights/ai-insights';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    NgChartsModule,
-    NavbarComponent,
-    AiInsightsComponent,
-    DatePipe
-  ],
+  imports: [CommonModule, FormsModule, NgChartsModule, NavbarComponent, AiInsightsComponent, DatePipe],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss']
 })
 export class DashboardComponent implements OnInit {
-  type = '';
-  category = '';
-  amount = '';
-  date = '';
+  user: any = null;
   transactions: any[] = [];
   filteredTransactions: any[] = [];
-  selectedMonth: string = '';
-  user: any;
 
-  pieData!: ChartData<'pie'>;
-  barData!: ChartData<'bar'>;
-  pieOptions: any;
-  barOptions: any;
+  type = 'Income';
+  category = '';
+  amount: number | null = null;
+  date = '';
+  selectedMonth = '';
+
+  pieData: ChartConfiguration<'pie'>['data'] = {
+    labels: ['Income', 'Expense'],
+    datasets: [
+      {
+        data: [0, 0],
+        backgroundColor: ['#4CAF50', '#F44336'], // ✅ Green = Income, Red = Expense
+        hoverBackgroundColor: ['#66BB6A', '#E57373']
+      }
+    ]
+  };
+
+  barData: ChartConfiguration<'bar'>['data'] = {
+    labels: [],
+    datasets: [
+      {
+        label: 'Monthly Savings',
+        data: [],
+        backgroundColor: '#FFB6C1' // 🎨 Light pink for savings
+      }
+    ]
+  };
+
+  pieOptions = { responsive: true };
+  barOptions = { responsive: true };
 
   constructor(private api: ApiService) {}
 
   ngOnInit() {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      this.user = JSON.parse(storedUser);
-      this.fetchTransactions();
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      this.user = JSON.parse(userData);
+      this.getTransactions();
     }
   }
 
-  fetchTransactions() {
+  getTransactions() {
     const token = localStorage.getItem('token');
-    if (!token || !this.user) return;
+    if (!this.user || !token) return;
+
+    console.log('Fetching transactions for user:', this.user.id);
 
     this.api.getTransactions(this.user.id, token).subscribe({
-      next: (res) => {
+      next: (res: any) => {
+        console.log('Fetched transactions:', res);
         this.transactions = res || [];
-        this.filteredTransactions = [...this.transactions];
-        this.updateCharts();
+        this.filterTransactions();
       },
-      error: (err) => console.error('Error fetching transactions:', err)
+      error: (err) => {
+        console.error('Error fetching transactions:', err);
+      }
     });
   }
 
   add() {
-    const token = localStorage.getItem('token');
-    if (!this.type || !this.category || !this.amount || !this.date) {
-      alert('Please fill all fields.');
+    if (!this.category || !this.amount || !this.date) {
+      alert('Please fill all fields before adding a transaction.');
       return;
     }
 
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const token = localStorage.getItem('token') || '';
+
     const payload = {
-      userId: this.user.id,
+      userId: user.id.toString(),
       type: this.type,
       category: this.category,
-      amount: Number(this.amount),
-      date: this.date,
-      createdAt: new Date()
+      amount: this.amount,
+      date: this.date
     };
 
-    this.api.addTransaction(payload, token || '').subscribe({
-      next: () => {
-        alert('✅ Transaction added successfully!');
-        this.fetchTransactions();
-        this.type = this.category = this.amount = this.date = '';
+    console.log('Sending payload:', payload);
+    console.log('Using token:', token);
+
+    this.api.addTransaction(payload, token).subscribe({
+      next: (res: any) => {
+        console.log('Transaction added successfully:', res);
+        this.transactions.push(res);
+        this.filterTransactions();
+        this.category = '';
+        this.amount = null;
+        this.date = '';
       },
       error: (err) => {
         console.error('Error adding transaction:', err);
-        alert('Error adding transaction.');
       }
     });
   }
@@ -92,74 +116,62 @@ export class DashboardComponent implements OnInit {
   filterTransactions() {
     if (!this.selectedMonth) {
       this.filteredTransactions = [...this.transactions];
-      this.updateCharts();
-      return;
+    } else {
+      this.filteredTransactions = this.transactions.filter(t => {
+        const month = new Date(t.date).toISOString().slice(0, 7);
+        return month === this.selectedMonth;
+      });
     }
-
-    const [year, month] = this.selectedMonth.split('-').map(Number);
-    const filtered = this.transactions.filter((t) => {
-      const d = new Date(t.date);
-      return d.getMonth() + 1 === month && d.getFullYear() === year;
-    });
-
-    // If no data found for that month — show empty data instead of everything
-    this.filteredTransactions = filtered.length ? filtered : [];
     this.updateCharts();
   }
 
   updateCharts() {
-    const source = this.filteredTransactions.length
-      ? this.filteredTransactions
-      : [];
+    const dataSource = this.filteredTransactions.length ? this.filteredTransactions : this.transactions;
 
-    const income = source
-      .filter((t) => t.type.toLowerCase() === 'income')
-      .reduce((sum, t) => sum + t.amount, 0);
+    const income = dataSource
+      .filter(t => t.type === 'Income')
+      .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    const expense = source
-      .filter((t) => t.type.toLowerCase() === 'expense')
-      .reduce((sum, t) => sum + t.amount, 0);
+    const expense = dataSource
+      .filter(t => t.type === 'Expense')
+      .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    const savings = income - expense;
-
-    // PIE CHART — Income vs Expense
     this.pieData = {
       labels: ['Income', 'Expense'],
       datasets: [
         {
           data: [income, expense],
-          backgroundColor: ['#4CAF50', '#F44336']
+          backgroundColor: ['#4CAF50', '#F44336'], // ✅ Consistent colors
+          hoverBackgroundColor: ['#66BB6A', '#E57373']
         }
       ]
     };
 
-    // BAR CHART — Monthly Savings Trend
+    const months: string[] = [];
+    const monthlySavings: number[] = [];
+
+    const grouped = dataSource.reduce((acc: any, t: any) => {
+      const month = new Date(t.date).toLocaleString('default', { month: 'short', year: 'numeric' });
+      if (!acc[month]) acc[month] = { income: 0, expense: 0 };
+      if (t.type === 'Income') acc[month].income += Number(t.amount);
+      else acc[month].expense += Number(t.amount);
+      return acc;
+    }, {});
+
+    Object.keys(grouped).forEach(m => {
+      months.push(m);
+      monthlySavings.push(grouped[m].income - grouped[m].expense);
+    });
+
     this.barData = {
-      labels: ['Savings'],
+      labels: months,
       datasets: [
         {
           label: 'Monthly Savings',
-          data: [savings > 0 ? savings : 0],
-          backgroundColor: ['#43A047']
+          data: monthlySavings,
+          backgroundColor: '#FFB6C1' // ✅ Light pink for monthly savings
         }
       ]
-    };
-
-    this.pieOptions = {
-      responsive: true,
-      plugins: {
-        legend: { position: 'bottom' }
-      }
-    };
-
-    this.barOptions = {
-      responsive: true,
-      scales: {
-        y: { beginAtZero: true }
-      },
-      plugins: {
-        legend: { position: 'bottom' }
-      }
     };
   }
 }
