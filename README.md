@@ -1,91 +1,94 @@
-Finance Tracker
-Overview
+# **Finance Tracker**
+A full-stack **personal finance tracking application** designed to help users manage their income, expenses, and savings efficiently. It provides visual insights using charts, AI-based expense suggestions, and monthly summaries for better financial planning.
 
-Finance Tracker is a full-stack web application that allows users to manage their income and expenses efficiently.
-It provides an interactive dashboard with charts, month-wise transaction tracking, and AI-generated financial insights to help users understand their spending and saving patterns.
+---
 
-Features
+## **Features**
+- User authentication (Register & Login)  
+- Add, view, and manage transactions (Income & Expenses)  
+- Monthly filtering to view specific transaction data  
+- Pie chart showing **Income vs Expenses**  
+- Bar chart showing **Monthly Savings Trends**  
+- AI-based insights providing:  
+  - Spending and saving tips  
+  - Monthly performance comparisons  
+  - Suggestions on where to reduce expenses  
+- Clean and responsive dashboard interface  
 
-Add, edit, and view income and expense transactions
+---
 
-Filter transactions by month
+## **Tech Stack**
+**Frontend:** Angular, TypeScript, HTML, SCSS, Chart.js, ng2-charts  
+**Backend:** ASP.NET Core Web API, C#, Entity Framework Core, SQLite Database  
 
-View total income, expenses, and savings for each month
+---
 
-Visual representation of financial data using charts
+## **Project Structure**
+finance-tracker/  
+│  
+├── backend/  
+│   ├── FinanceApi/  
+│   │   ├── Controllers/  
+│   │   ├── Data/  
+│   │   ├── Models/  
+│   │   ├── Program.cs  
+│   │   └── appsettings.json  
+│   └── finance_tracker.db  
+│  
+├── frontend/  
+│   ├── src/  
+│   │   ├── app/  
+│   │   │   ├── components/  
+│   │   │   ├── pages/  
+│   │   │   ├── services/  
+│   │   │   └── app.routes.ts  
+│   │   ├── index.html  
+│   │   ├── main.ts  
+│   │   └── styles.scss  
+│   ├── angular.json  
+│   ├── package.json  
+│   └── tsconfig.json  
+│  
+└── README.md  
 
-AI-based insights for cost-cutting and savings suggestions
+---
 
-Secure user authentication system
+## **Setup Instructions**
 
-Tech Stack
+### **1. Clone the repository**
+git clone https://github.com/<your-username>/finance-tracker.git  
+cd finance-tracker  
 
-Frontend:
+### **2. Backend setup**
+cd backend/FinanceApi  
+dotnet restore  
+dotnet run  
+Your backend will start at: **http://localhost:5041/swagger**  
 
-Angular
+### **3. Frontend setup**
+cd frontend  
+npm install  
+ng serve --proxy-config proxy.conf.json --open  
+Your frontend will start at: **http://localhost:4200**  
 
-Chart.js and ng2-charts
+---
 
-Bootstrap / SCSS
+## **Usage**
+1. Register or Login to your account.  
+2. Add income and expense transactions.  
+3. Filter transactions by month.  
+4. View insights, charts, and savings trends.  
+5. Get AI-based financial suggestions.  
 
-Backend:
+---
 
-ASP.NET Core Web API
+## **Future Enhancements**
+- Add export to CSV or Excel feature.  
+- Enable multi-user account management.  
+- Integrate currency conversion API.  
+- Add dark mode and mobile optimization.  
 
-Entity Framework Core
+---
 
-SQLite Database
-
-Installation and Setup
-Backend Setup
-
-Open a terminal and navigate to:
-
-cd backend/FinanceApi
-
-
-Restore dependencies and run the application:
-
-dotnet restore
-dotnet ef database update
-dotnet run
-
-
-The API will be available at http://localhost:5041.
-
-Frontend Setup
-
-Open a new terminal and navigate to:
-
-cd frontend
-
-
-Install dependencies and run the Angular app:
-
-npm install
-ng serve --proxy-config proxy.conf.json --open
-
-
-The frontend will open automatically at http://localhost:4200.
-
-Project Structure
-finance-tracker/
-│
-├── backend/
-│   └── FinanceApi/
-│       ├── Controllers/
-│       ├── Models/
-│       ├── Services/
-│       └── finance_tracker.db
-│
-├── frontend/
-│   ├── src/
-│   ├── angular.json
-│   ├── package.json
-│   └── tsconfig.json
-│
-└── README.md
-
-Developer
-
-Developed by Hrithik Krishna
+## **Author**
+**Hrithik Krishna**  
