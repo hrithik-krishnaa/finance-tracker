@@ -1,0 +1,85 @@
+<app-navbar></app-navbar>
+
+<div class="dashboard-container">
+  <!-- Left Side: Add Transaction + AI Insights -->
+  <div class="left-panel">
+    <div class="add-transaction">
+      <h2>Add Transaction</h2>
+      <select [(ngModel)]="type">
+        <option value="" disabled selected>Type</option>
+        <option value="Income">Income</option>
+        <option value="Expense">Expense</option>
+      </select>
+      <input type="text" [(ngModel)]="category" placeholder="Category" />
+      <input type="number" [(ngModel)]="amount" placeholder="Amount" />
+      <input type="date" [(ngModel)]="date" />
+      <button (click)="add()">Add</button>
+    </div>
+
+    <app-ai-insights
+      [transactions]="filteredTransactions.length ? filteredTransactions : transactions"
+    ></app-ai-insights>
+  </div>
+
+  <!-- Right Side: Transactions + Charts -->
+  <div class="right-panel">
+    <div class="month-filter">
+      <label for="month">Filter by Month:</label>
+      <input
+        type="month"
+        id="month"
+        [(ngModel)]="selectedMonth"
+        (change)="filterTransactions()"
+      />
+      <button (click)="selectedMonth = ''; filterTransactions()">Clear</button>
+    </div>
+
+    <h2>Transactions</h2>
+
+    <!-- Transaction List -->
+    <div *ngIf="filteredTransactions.length; else noData">
+      <div
+        *ngFor="let t of filteredTransactions"
+        [ngClass]="{ income: t.type === 'Income', expense: t.type === 'Expense' }"
+        class="transaction-item"
+      >
+        <div class="transaction-details">
+          <strong>{{ t.category }}</strong> — {{ t.type.toLowerCase() }}
+          <span class="date">{{ t.date | date: 'MMM d, y' }}</span>
+        </div>
+        <div
+          class="amount"
+          [ngStyle]="{
+            color: t.type === 'Income' ? 'green' : 'red',
+            fontWeight: 'bold'
+          }"
+        >
+          ₹{{ t.amount }}
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noData>
+      <p class="no-transactions">No transactions found for this month.</p>
+    </ng-template>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <h3>Income vs Expense</h3>
+      <canvas
+        baseChart
+        [data]="pieData"
+        [options]="pieOptions"
+        chartType="pie"
+      ></canvas>
+
+      <h3>Monthly Savings Trend</h3>
+      <canvas
+        baseChart
+        [data]="barData"
+        [options]="barOptions"
+        chartType="bar"
+      ></canvas>
+    </div>
+  </div>
+</div>

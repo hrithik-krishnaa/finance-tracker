@@ -1,0 +1,10 @@
+.login-container {
+  height: 100vh;
+  background: linear-gradient(135deg, #f0f8ff, #ffffff);
+  padding-top: 2rem;
+}
+.login-box {
+  width: 420px;
+  animation: fadeInUp 0.6s ease;
+}
+input.form-control { border-radius: 10px; }

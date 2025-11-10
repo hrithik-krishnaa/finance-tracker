@@ -1,0 +1,20 @@
+<div class="auth-page d-flex align-items-center justify-content-center">
+  <div class="auth-card p-4 shadow-sm rounded-4">
+    <h3 class="mb-3 text-primary">Create Account</h3>
+
+    <div *ngIf="error" class="alert alert-danger small">{{ error }}</div>
+    <div *ngIf="success" class="alert alert-success small">{{ success }}</div>
+
+    <input class="form-control mb-2" placeholder="Full name" [(ngModel)]="fullName" />
+    <input class="form-control mb-2" placeholder="Email" [(ngModel)]="email" type="email" />
+    <input class="form-control mb-3" placeholder="Password" [(ngModel)]="password" type="password" />
+
+    <button class="btn btn-primary w-100 rounded-pill" (click)="register()" [disabled]="loading">
+      {{ loading ? 'Creating...' : 'Create Account' }}
+    </button>
+
+    <div class="mt-3 small text-center">
+      Already have an account? <a routerLink="/login">Login</a>
+    </div>
+  </div>
+</div>

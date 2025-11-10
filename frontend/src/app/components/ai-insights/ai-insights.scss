@@ -1,0 +1,35 @@
+.ai-insights-card {
+  background: #f3e8ff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 6px 18px rgba(78, 35, 90, 0.06);
+
+  h3 {
+    margin: 0 0 8px 0;
+    color: #4b2a66;
+  }
+
+  .empty {
+    color: #6b6b7a;
+    font-size: 14px;
+  }
+
+  .insight-text p {
+    margin: 6px 0 12px 0;
+    font-weight: 600;
+    color: #2f1a3f;
+  }
+
+  .suggestions h4 {
+    margin: 0 0 6px 0;
+    font-size: 14px;
+    color: #3b2a5a;
+  }
+
+  .suggestions ul {
+    margin: 0;
+    padding-left: 18px;
+    color: #4b4b5c;
+    font-size: 13px;
+  }
+}

@@ -1,0 +1,18 @@
+<div class="ai-insights-card">
+  <h3>AI Insights 💡</h3>
+
+  <div *ngIf="!transactions || transactions.length === 0" class="empty">
+    Add some transactions to see insights!
+  </div>
+
+  <div *ngIf="transactions && transactions.length > 0" class="insight-text">
+    <p>{{ insight }}</p>
+
+    <div class="suggestions" *ngIf="transactions.length > 0">
+      <h4>Quick suggestions</h4>
+      <ul>
+        <li *ngFor="let s of actionableSuggestions">{{ s }}</li>
+      </ul>
+    </div>
+  </div>
+</div>
