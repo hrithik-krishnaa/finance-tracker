@@ -1,0 +1,16 @@
+# Ignore database files
+*.db
+*.db-shm
+*.db-wal
+
+# Ignore build and system folders
+bin/
+obj/
+node_modules/
+dist/
+.env
+
+# VSCode and OS junk files
+.vscode/
+.DS_Store
+Thumbs.db
